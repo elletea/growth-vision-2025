@@ -1,0 +1,4 @@
+{
+  "buildCommand": "cp .npmrc.vercel .npmrc && npm install && next build",
+  "installCommand": "cp .npmrc.vercel .npmrc && npm install"
+}

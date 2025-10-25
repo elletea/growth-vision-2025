@@ -1,4 +1,4 @@
-registry=${NPM_REGISTRY:-https://global.block-artifacts.com/artifactory/api/npm/square-npm/}
+registry=https://registry.npmjs.org/
 prefer-offline=true
 timeout=600000
 fetch-retries=5
