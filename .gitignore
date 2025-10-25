@@ -28,6 +28,9 @@ yarn-error.log*
 # local env files
 .env*.local
 
+# npm config (use ~/.npmrc for local dev, Vercel configures separately)
+.npmrc
+
 # vercel
 .vercel
 
