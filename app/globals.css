@@ -2,6 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: 'CashSans';
+  src: url('/fonts/CashSans-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'CashSans';
+  src: url('/fonts/CashSans-Medium.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'ExactBlock';
+  src: url('/fonts/ExactBlock-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
