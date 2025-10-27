@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 
 export default function Home() {
@@ -30,6 +32,24 @@ export default function Home() {
             style={{ fontFamily: 'CashSans, sans-serif' }}
           >
             Split-screen experience with education on the left and interactive demo on the right
+          </p>
+        </Link>
+
+        <Link
+          href="/prototype"
+          className="bg-white rounded-2xl p-8 hover:shadow-lg transition-shadow"
+        >
+          <h2
+            className="text-[28px] leading-[1.2] text-black mb-3"
+            style={{ fontFamily: 'ExactBlock, sans-serif' }}
+          >
+            One Block at a Time
+          </h2>
+          <p
+            className="text-[16px] leading-[1.5] text-gray-500"
+            style={{ fontFamily: 'CashSans, sans-serif' }}
+          >
+            Build and grow on your terms
           </p>
         </Link>
 
