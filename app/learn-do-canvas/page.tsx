@@ -69,6 +69,9 @@ export default function LearnDoCanvas() {
   const [leftWidth, setLeftWidth] = useState(50); // percentage
   const [isDragging, setIsDragging] = useState(false);
   const [selectedColor, setSelectedColor] = useState('#497472');
+  const [isLearnCollapsed, setIsLearnCollapsed] = useState(false);
+  const [customColors, setCustomColors] = useState<string[]>([]);
+  const [selectedBusiness, setSelectedBusiness] = useState<{emoji: string; color: string; name: string} | null>(null);
 
   const current = capabilities.find(c => c.id === selectedCapability)!;
 
@@ -76,7 +79,30 @@ export default function LearnDoCanvas() {
     alert(`Payment processed!\nAmount: $${amount}\nEmail: ${email}\nNote: ${note}`);
   };
 
-  const handleMouseDown = () => {
+  const handleNumberPress = (num: string) => {
+    if (amount === '0') {
+      setAmount(num);
+    } else {
+      setAmount(amount + num);
+    }
+  };
+
+  const handleBackspace = () => {
+    if (amount.length > 1) {
+      setAmount(amount.slice(0, -1));
+    } else {
+      setAmount('0');
+    }
+  };
+
+  const handleDecimal = () => {
+    if (!amount.includes('.')) {
+      setAmount(amount + '.');
+    }
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    e.stopPropagation();
     setIsDragging(true);
   };
 
@@ -93,6 +119,20 @@ export default function LearnDoCanvas() {
     const mouseX = e.clientX - rect.left - sidebarWidth;
     const percentage = (mouseX / availableWidth) * 100;
     setLeftWidth(Math.min(Math.max(percentage, 20), 80));
+  };
+
+  const handleDragHandleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!isDragging) {
+      setIsLearnCollapsed(!isLearnCollapsed);
+    }
+  };
+
+  const handleDemoBusinessClick = (color: string) => {
+    setSelectedColor(color);
+    if (!customColors.includes(color)) {
+      setCustomColors([...customColors, color]);
+    }
   };
 
   return (
@@ -143,10 +183,15 @@ export default function LearnDoCanvas() {
             <Store size={24} color="#666" />
           </button>
           <button
-            className="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
+            className="w-10 h-10 flex items-center justify-center rounded-lg transition-colors overflow-hidden"
+            style={{ backgroundColor: selectedBusiness?.color || '#f3f4f6' }}
             onClick={() => setView('create-business')}
           >
-            <span className="text-[24px] text-gray-400">+</span>
+            {selectedBusiness ? (
+              <span className="text-[20px]">{selectedBusiness.emoji}</span>
+            ) : (
+              <span className="text-[24px] text-gray-400">+</span>
+            )}
           </button>
         </div>
       </div>
@@ -157,7 +202,7 @@ export default function LearnDoCanvas() {
             <div className="grid grid-cols-3 gap-6 w-full max-w-5xl">
             {/* Locations */}
             <div className="bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-lg transition-shadow aspect-square flex flex-col">
-              <h3 className="text-[18px] font-medium mb-1" style={{ fontFamily: 'CashSans, sans-serif' }}>
+              <h3 className="text-[18px] font-medium mb-1 text-black" style={{ fontFamily: 'CashSans, sans-serif' }}>
                 Locations
               </h3>
               <p className="text-[14px] text-gray-500" style={{ fontFamily: 'CashSans, sans-serif' }}>
@@ -166,7 +211,7 @@ export default function LearnDoCanvas() {
               <div className="mt-auto">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-green-500 rounded-full" />
-                  <span className="text-[14px]" style={{ fontFamily: 'CashSans, sans-serif' }}>
+                  <span className="text-[14px] text-black" style={{ fontFamily: 'CashSans, sans-serif' }}>
                     St. James Street
                   </span>
                 </div>
@@ -175,7 +220,7 @@ export default function LearnDoCanvas() {
 
             {/* Items */}
             <div className="bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-lg transition-shadow aspect-square flex flex-col">
-              <h3 className="text-[18px] font-medium mb-1" style={{ fontFamily: 'CashSans, sans-serif' }}>
+              <h3 className="text-[18px] font-medium mb-1 text-black" style={{ fontFamily: 'CashSans, sans-serif' }}>
                 Items
               </h3>
               <p className="text-[14px] text-gray-500 mb-2" style={{ fontFamily: 'CashSans, sans-serif' }}>
@@ -186,7 +231,7 @@ export default function LearnDoCanvas() {
                   Running low
                 </div>
                 <div className="flex items-center justify-between mt-1">
-                  <span className="text-[14px]" style={{ fontFamily: 'CashSans, sans-serif' }}>
+                  <span className="text-[14px] text-black" style={{ fontFamily: 'CashSans, sans-serif' }}>
                     Croissants
                   </span>
                   <span className="text-[14px] text-red-500 font-semibold" style={{ fontFamily: 'CashSans, sans-serif' }}>
@@ -198,7 +243,7 @@ export default function LearnDoCanvas() {
 
             {/* Reporting */}
             <div className="bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-lg transition-shadow aspect-square flex flex-col">
-              <h3 className="text-[18px] font-medium mb-1" style={{ fontFamily: 'CashSans, sans-serif' }}>
+              <h3 className="text-[18px] font-medium mb-1 text-black" style={{ fontFamily: 'CashSans, sans-serif' }}>
                 Reporting
               </h3>
               <p className="text-[14px] text-gray-500" style={{ fontFamily: 'CashSans, sans-serif' }}>
@@ -208,7 +253,7 @@ export default function LearnDoCanvas() {
 
             {/* Staff */}
             <div className="bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-lg transition-shadow aspect-square flex flex-col">
-              <h3 className="text-[18px] font-medium mb-1" style={{ fontFamily: 'CashSans, sans-serif' }}>
+              <h3 className="text-[18px] font-medium mb-1 text-black" style={{ fontFamily: 'CashSans, sans-serif' }}>
                 Staff
               </h3>
               <p className="text-[14px] text-gray-500" style={{ fontFamily: 'CashSans, sans-serif' }}>
@@ -218,7 +263,7 @@ export default function LearnDoCanvas() {
 
             {/* Customers */}
             <div className="bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-lg transition-shadow aspect-square flex flex-col">
-              <h3 className="text-[18px] font-medium mb-1" style={{ fontFamily: 'CashSans, sans-serif' }}>
+              <h3 className="text-[18px] font-medium mb-1 text-black" style={{ fontFamily: 'CashSans, sans-serif' }}>
                 Customers
               </h3>
               <p className="text-[14px] text-gray-500" style={{ fontFamily: 'CashSans, sans-serif' }}>
@@ -228,7 +273,7 @@ export default function LearnDoCanvas() {
 
             {/* Money */}
             <div className="bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-lg transition-shadow aspect-square flex flex-col">
-              <h3 className="text-[18px] font-medium mb-1" style={{ fontFamily: 'CashSans, sans-serif' }}>
+              <h3 className="text-[18px] font-medium mb-1 text-black" style={{ fontFamily: 'CashSans, sans-serif' }}>
                 Money
               </h3>
             </div>
@@ -245,7 +290,10 @@ export default function LearnDoCanvas() {
       {view === 'capability' && (
         <>
           {/* Learn Canvas */}
-          <div className="bg-white flex flex-col overflow-hidden" style={{ width: `${leftWidth}%` }}>
+          <div
+            className="bg-white flex flex-col overflow-hidden transition-all duration-500 ease-in-out"
+            style={{ width: isLearnCollapsed ? '0%' : `${leftWidth}%` }}
+          >
         <div className="px-12 pt-10 pb-6">
           <p
             className="text-[12px] tracking-[1px] text-[#959595] mb-6"
@@ -293,36 +341,90 @@ export default function LearnDoCanvas() {
 
       {/* Action Canvas */}
       <div className="flex-1 bg-[#f7f7f7] overflow-hidden relative">
-        <div className="h-full flex items-center justify-center p-3">
+        <div className="h-full flex items-center justify-center p-6">
           {/* Content Area with border and rounded corners */}
-          <div className="bg-[#fdfdfd] border border-[rgba(0,0,0,0.05)] rounded-[32px] h-[calc(100%-24px)] w-full flex items-center justify-center p-14 relative">
+          <div className="bg-[#fdfdfd] border border-[rgba(0,0,0,0.05)] rounded-[32px] h-[calc(100%-32px)] w-full flex items-center justify-center p-8 relative transition-all duration-300">
             {/* Drag Handle - floating over the box */}
             <div
-              className="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-12 bg-gray-400/80 backdrop-blur-sm rounded-full shadow-lg flex items-center justify-center cursor-col-resize hover:bg-gray-500/80 transition-colors z-20"
+              className="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-12 bg-gray-400/80 backdrop-blur-sm rounded-full shadow-lg flex items-center justify-center cursor-pointer hover:bg-gray-500/80 transition-all duration-200 z-20 group"
               onMouseDown={handleMouseDown}
+              onClick={handleDragHandleClick}
             >
-              <div className="w-0.5 h-6 bg-white/60 rounded-full" />
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 12 12"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className={`transition-transform duration-300 ${isLearnCollapsed ? 'rotate-180' : ''}`}
+              >
+                <path
+                  d="M8 3L5 6L8 9"
+                  stroke="white"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  opacity="0.6"
+                />
+              </svg>
             </div>
             {selectedCapability === 'payments' && (
-              <div className="bg-white border border-[#333333] rounded-[20px] p-12 flex items-center justify-center shadow-sm overflow-hidden" style={{ height: '560px', width: '100%', maxWidth: '600px' }}>
-                <div className="bg-gradient-to-br from-emerald-900 via-teal-800 to-yellow-700 absolute inset-0 rounded-[20px]" />
-                <div className="w-full relative z-10">
-                  <div className="text-center mb-12">
+              <div className="bg-white border border-[#333333] rounded-[24px] p-8 flex items-center justify-center shadow-md overflow-y-auto transition-all duration-300 hover:shadow-lg" style={{ height: 'min(680px, 85vh)', width: '100%', maxWidth: 'min(600px, 90%)' }}>
+                <div className="bg-gradient-to-br from-emerald-900 via-teal-800 to-yellow-700 absolute inset-0 rounded-[24px] transition-opacity duration-300" />
+                <div className="w-full relative z-10 flex flex-col">
+                  <div className="text-center mb-8">
                     <div
-                      className="text-[90px] leading-none text-white font-medium"
+                      className="text-[clamp(48px,6vw,64px)] leading-none text-white font-medium transition-all duration-200"
                       style={{ fontFamily: 'CashSans, sans-serif' }}
                     >
                       ${amount}
                     </div>
                   </div>
 
-                  <div className="space-y-5">
+                  {/* Number Pad */}
+                  <div className="grid grid-cols-3 gap-2.5 mb-6 mx-auto w-[240px]">
+                    {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((num) => (
+                      <button
+                        key={num}
+                        onClick={() => handleNumberPress(num)}
+                        className="h-14 bg-white/10 backdrop-blur-sm border border-white/30 rounded-xl text-white text-[20px] font-medium hover:bg-white/20 active:scale-95 transition-all duration-150"
+                        style={{ fontFamily: 'CashSans, sans-serif' }}
+                      >
+                        {num}
+                      </button>
+                    ))}
+                    <button
+                      onClick={handleDecimal}
+                      className="h-14 bg-white/10 backdrop-blur-sm border border-white/30 rounded-xl text-white text-[20px] font-medium hover:bg-white/20 active:scale-95 transition-all duration-150"
+                      style={{ fontFamily: 'CashSans, sans-serif' }}
+                    >
+                      .
+                    </button>
+                    <button
+                      onClick={() => handleNumberPress('0')}
+                      className="h-14 bg-white/10 backdrop-blur-sm border border-white/30 rounded-xl text-white text-[20px] font-medium hover:bg-white/20 active:scale-95 transition-all duration-150"
+                      style={{ fontFamily: 'CashSans, sans-serif' }}
+                    >
+                      0
+                    </button>
+                    <button
+                      onClick={handleBackspace}
+                      className="h-14 bg-white/10 backdrop-blur-sm border border-white/30 rounded-xl text-white text-[16px] font-medium hover:bg-white/20 active:scale-95 transition-all duration-150 flex items-center justify-center"
+                      style={{ fontFamily: 'CashSans, sans-serif' }}
+                    >
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M19 11H7.83L10.41 8.41L9 7L4 12L9 17L10.41 15.59L7.83 13H19V11Z" fill="white" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  <div className="space-y-3">
                     <input
                       type="text"
-                      placeholder="Recipient's email address"
+                      placeholder="Recipient's email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full px-6 py-4 bg-white/10 backdrop-blur-sm border border-white/30 rounded-[20px] text-white placeholder-white/60 text-[16px] focus:outline-none focus:ring-2 focus:ring-white/40"
+                      className="w-full px-5 py-3 bg-white/10 backdrop-blur-sm border border-white/30 rounded-[16px] text-white placeholder-white/60 text-[14px] focus:outline-none focus:ring-2 focus:ring-white/40 focus:bg-white/15 transition-all duration-200"
                       style={{ fontFamily: 'CashSans, sans-serif' }}
                     />
 
@@ -331,12 +433,12 @@ export default function LearnDoCanvas() {
                       placeholder="What's it for?"
                       value={note}
                       onChange={(e) => setNote(e.target.value)}
-                      className="w-full px-6 py-4 bg-white/10 backdrop-blur-sm border border-white/30 rounded-[20px] text-white placeholder-white/60 text-[16px] focus:outline-none focus:ring-2 focus:ring-white/40"
+                      className="w-full px-5 py-3 bg-white/10 backdrop-blur-sm border border-white/30 rounded-[16px] text-white placeholder-white/60 text-[14px] focus:outline-none focus:ring-2 focus:ring-white/40 focus:bg-white/15 transition-all duration-200"
                       style={{ fontFamily: 'CashSans, sans-serif' }}
                     />
 
-                    <div className="flex gap-3 pt-8">
-                      <button className="w-12 h-12 flex items-center justify-center bg-white/10 backdrop-blur-sm border border-white/30 rounded-full hover:bg-white/20 transition-colors">
+                    <div className="flex gap-3 pt-4">
+                      <button className="w-11 h-11 flex items-center justify-center bg-white/10 backdrop-blur-sm border border-white/30 rounded-full hover:bg-white/20 active:scale-95 transition-all duration-200">
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                           <rect x="2" y="2" width="6" height="6" fill="white" />
                           <rect x="12" y="2" width="6" height="6" fill="white" />
@@ -349,7 +451,7 @@ export default function LearnDoCanvas() {
                       </button>
                       <button
                         onClick={handlePayment}
-                        className="flex-1 px-8 py-3 bg-white text-black rounded-full text-[16px] font-semibold hover:bg-white/90 transition-colors"
+                        className="flex-1 px-8 py-3 bg-white text-black rounded-full text-[15px] font-semibold hover:bg-white/90 active:scale-[0.98] transition-all duration-200"
                         style={{ fontFamily: 'CashSans, sans-serif' }}
                       >
                         Take payment
@@ -361,11 +463,11 @@ export default function LearnDoCanvas() {
             )}
 
             {selectedCapability !== 'payments' && (
-              <div className="bg-white border border-[#333333] rounded-[20px] p-12 flex items-center justify-center text-center shadow-sm overflow-hidden" style={{ height: '560px', width: '100%', maxWidth: '600px' }}>
-                <div className="bg-gradient-to-br from-emerald-900 via-teal-800 to-yellow-700 absolute inset-0 rounded-[20px]" />
+              <div className="bg-white border border-[#333333] rounded-[24px] p-12 flex items-center justify-center text-center shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg" style={{ height: 'min(560px, 80vh)', width: '100%', maxWidth: 'min(600px, 90%)' }}>
+                <div className="bg-gradient-to-br from-emerald-900 via-teal-800 to-yellow-700 absolute inset-0 rounded-[24px] transition-opacity duration-300" />
                 <div className="relative z-10">
                   <p
-                    className="text-white/50 text-[18px]"
+                    className="text-white/50 text-[18px] transition-colors duration-200"
                     style={{ fontFamily: 'CashSans, sans-serif' }}
                   >
                     Interactive demo coming soon
@@ -416,9 +518,19 @@ export default function LearnDoCanvas() {
                     />
                   </div>
                   <div className="h-0 w-[34px] border-t border-gray-200" />
-                  <button className="w-[24px] h-[24px] rounded-full overflow-hidden hover:ring-2 hover:ring-offset-2 hover:ring-gray-300 transition-all flex items-center justify-center">
-                    <span className="text-[14px] text-gray-400">+</span>
-                  </button>
+                  {customColors.map((color, index) => (
+                    <button
+                      key={`custom-${index}`}
+                      className="w-[24px] h-[24px] rounded-full hover:ring-2 hover:ring-offset-2 hover:ring-gray-300 transition-all"
+                      style={{ backgroundColor: color }}
+                      onClick={() => setSelectedColor(color)}
+                    />
+                  ))}
+                  {customColors.length === 0 && (
+                    <button className="w-[24px] h-[24px] rounded-full overflow-hidden hover:ring-2 hover:ring-offset-2 hover:ring-gray-300 transition-all flex items-center justify-center">
+                      <span className="text-[14px] text-gray-400">+</span>
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -429,7 +541,10 @@ export default function LearnDoCanvas() {
                 </p>
                 <div className="flex gap-[30px] items-center">
                   {/* Burger Joint Bistro */}
-                  <button className="flex flex-col gap-[10px] items-start hover:opacity-80 transition-opacity">
+                  <button
+                    className="flex flex-col gap-[10px] items-start hover:opacity-80 transition-opacity"
+                    onClick={() => setSelectedBusiness({emoji: '🍔', color: '#ff87be', name: 'Burger Joint Bistro'})}
+                  >
                     <div className="h-[203px] w-[162px] bg-[#ff87be] rounded-[8px] overflow-hidden flex items-center justify-center">
                       <div className="text-[48px]">🍔</div>
                     </div>
@@ -444,7 +559,10 @@ export default function LearnDoCanvas() {
                   </button>
 
                   {/* Salon Berry */}
-                  <button className="flex flex-col gap-[10px] items-start hover:opacity-80 transition-opacity">
+                  <button
+                    className="flex flex-col gap-[10px] items-start hover:opacity-80 transition-opacity"
+                    onClick={() => setSelectedBusiness({emoji: '✋', color: '#4d00ff', name: 'Salon Berry'})}
+                  >
                     <div className="h-[203px] w-[162px] bg-[#4d00ff] rounded-[8px] overflow-hidden flex items-center justify-center">
                       <div className="text-[48px]">✋</div>
                     </div>
@@ -459,7 +577,10 @@ export default function LearnDoCanvas() {
                   </button>
 
                   {/* Retro Vintage */}
-                  <button className="flex flex-col gap-[10px] items-start hover:opacity-80 transition-opacity">
+                  <button
+                    className="flex flex-col gap-[10px] items-start hover:opacity-80 transition-opacity"
+                    onClick={() => setSelectedBusiness({emoji: '🎨', color: '#2563eb', name: 'Retro Vintage'})}
+                  >
                     <div className="h-[203px] w-[162px] bg-blue-600 rounded-[8px] overflow-hidden flex items-center justify-center">
                       <div className="text-[48px]">🎨</div>
                     </div>
@@ -474,7 +595,10 @@ export default function LearnDoCanvas() {
                   </button>
 
                   {/* Wolfie Wolves */}
-                  <button className="flex flex-col gap-[10px] items-start hover:opacity-80 transition-opacity">
+                  <button
+                    className="flex flex-col gap-[10px] items-start hover:opacity-80 transition-opacity"
+                    onClick={() => setSelectedBusiness({emoji: '🍀', color: '#224d2e', name: 'Wolfie Wolves'})}
+                  >
                     <div className="h-[203px] w-[162px] bg-[#224d2e] rounded-[8px] overflow-hidden flex items-center justify-center">
                       <div className="text-[48px]">🍀</div>
                     </div>
